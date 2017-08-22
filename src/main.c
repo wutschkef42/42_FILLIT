@@ -1,10 +1,21 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: plamusse <plamusse@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/08/17 19:39:00 by plamusse          #+#    #+#             */
+/*   Updated: 2017/08/17 20:32:16 by plamusse         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include <fcntl.h>
 #include "libft.h"
 #include "fillit.h"
 
 /*
-** Initializes empty map 
+** Initializes empty map
 */
 
 char	*init_map(int dim)
@@ -49,8 +60,9 @@ void	print_map(t_tetri *t, int count, int size)
 			while (x < t->width)
 			{
 				if ((t->value >> (16 * (y + 1) - x - 1)) & 1)
-					str[(t->offset_y + y) * (size + 1) + x + t->offset_x] = t->token;
-				x++;		
+					str[(t->ofst_y + y) * (size + 1) + x + t->ofst_x] =
+						t->token;
+				x++;
 			}
 			y++;
 		}
@@ -70,22 +82,20 @@ int		main(int argc, char **argv)
 
 	if (argc != 2)
 	{
-		ft_putstr("usage: ./fillit [data]");
+		ft_putstr("usage: ./fillit [data]\n");
 		return (1);
 	}
 	if ((count = load(open(argv[1], O_RDONLY), tetris)) == 0)
 	{
-		ft_putstr("error loading input");
+		ft_putstr("error\n");
 		return (1);
 	}
 	ft_bzero(map, sizeof(uint16_t) * 16);
 	if ((size = solve(tetris, count, map)) == 0)
 	{
-		ft_putstr("error running algorithm");
+		ft_putstr("error running algorithm\n");
 		return (1);
 	}
 	print_map(tetris, count, size);
 	return (0);
-
-
 }

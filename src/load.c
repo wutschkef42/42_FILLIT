@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   load.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: plamusse <plamusse@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/08/17 19:43:58 by plamusse          #+#    #+#             */
+/*   Updated: 2017/08/20 15:21:54 by plamusse         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "libft.h"
 #include "fillit.h"
@@ -34,7 +45,7 @@ void	get_coord(const char *str, char *crd)
 }
 
 /*
-** consumes 21 byte string representing a tetrimino and 
+** consumes 21 byte string representing a tetrimino and
 ** constructs t_tetri node representation
 */
 
@@ -84,11 +95,11 @@ int		count_connections(const char *str)
 		{
 			if ((i + 1) < 20 && str[i + 1] == '#')
 				count++;
-			if ((i - 1) < 20 && str[i - 1] == '#')
+			if ((i - 1) >= 0 && str[i - 1] == '#')
 				count++;
 			if ((i + 5) < 20 && str[i + 5] == '#')
 				count++;
-			if ((i - 5) < 20 && str[i - 5] == '#')
+			if ((i - 5) >= 0 && str[i - 5] == '#')
 				count++;
 		}
 		i++;
@@ -97,7 +108,7 @@ int		count_connections(const char *str)
 }
 
 /*
-** Parses 21 string byte representing a tetrimino and 
+** Parses 21 string byte representing a tetrimino and
 ** validates input format
 */
 
@@ -138,26 +149,26 @@ int		load(const int fd, t_tetri *tetris)
 	char	buf[22];
 	int		count;
 	int		i;
-	int		j;
-	char	token;
+	int		len;
 
-	token = 'A';
 	i = 0;
-	while ((count = read(fd, buf, 21) >= 20))
+	len = 0;
+	while (((count = read(fd, buf, 21)) >= 20) && i <= 26)
 	{
+		len += count;
 		if (parse_block(buf, count) != 0)
 			return (0);
-		tetris[i] = build_piece(buf, token++);
-		j = i - 1;
-		while (j >= 0)
+		tetris[i] = build_piece(buf, (char)i + 'A');
+		count = i - 1;
+		while (count >= 0)
 		{
-			if (tetris[j].value == tetris[i].value)
-				tetris[i].next = tetris + j;
-			j--;
+			if (tetris[count].value == tetris[i].value)
+				tetris[i].next = tetris + count;
+			count--;
 		}
 		i++;
 	}
-	if (count != 0)
+	if (count != 0 || (len + 1) % 21 != 0)
 		return (0);
-	return (token - 'A');
+	return (i);
 }
